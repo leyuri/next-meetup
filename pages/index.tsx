@@ -20,7 +20,7 @@ const DUMMY_MEETUPS = [
   },
 ];
 
-function HomePage(props) {
+function HomePage(props: any) {
   return <MeetupList meetups={props.meetups} />;
 }
 

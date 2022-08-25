@@ -3,13 +3,13 @@ import { useRef } from "react";
 import Card from "../ui/Card";
 import classes from "./NewMeetupForm.module.css";
 
-function NewMeetupForm(props) {
-  const titleInputRef = useRef();
-  const imageInputRef = useRef();
-  const addressInputRef = useRef();
-  const descriptionInputRef = useRef();
+function NewMeetupForm(props: any) {
+  const titleInputRef = useRef<any>();
+  const imageInputRef = useRef<any>();
+  const addressInputRef = useRef<any>();
+  const descriptionInputRef = useRef<any>();
 
-  function submitHandler(event) {
+  function submitHandler(event: any) {
     event.preventDefault();
 
     const enteredTitle = titleInputRef.current.value;
@@ -47,7 +47,7 @@ function NewMeetupForm(props) {
           <textarea
             id="description"
             required
-            rows="5"
+            rows={5}
             ref={descriptionInputRef}
           ></textarea>
         </div>

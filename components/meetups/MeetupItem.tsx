@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Card from "../ui/Card";
 import classes from "./MeetupItem.module.css";
 
-function MeetupItem(props) {
+function MeetupItem(props: any) {
   const router = useRouter();
 
   function showDetailsHandler() {
