@@ -6,8 +6,8 @@
 
 body {
   font-family: "Open Sans", "Lato", sans-serif;
-  color: black;
-  background: white;
+  color: black !important;
+  background: white !important;
   margin: 0;
 }
 
