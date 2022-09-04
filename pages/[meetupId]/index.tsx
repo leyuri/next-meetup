@@ -1,50 +1,73 @@
+import { MongoClient, ObjectId } from "mongodb";
+import { username, password } from "../../config/mongodb";
 import MeetupDetail from "../../components/meetups/MeetupDetail";
+import * as mongoose from "mongoose";
 
-function MeetupDatails() {
+interface Meetup {
+  meetupData: {
+    image: string;
+    _id: ObjectId;
+    title: string;
+    address: string;
+    description: string;
+  };
+}
+
+function MeetupDatails(props: Meetup) {
   return (
     <MeetupDetail
-      image={
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/1280px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg"
-      }
-      title={"A First Meetup"}
-      address={"Some Street 5, Some City"}
-      description={"The meetup description"}
+      image={props.meetupData.image}
+      title={props.meetupData.title}
+      address={props.meetupData.address}
+      description={props.meetupData.description}
     />
   );
 }
 
 export async function getStaticPaths() {
+  const client = await MongoClient.connect(
+    `mongodb+srv://${username}:${password}@cluster0.86k80sc.mongodb.net/meetups?retryWrites=true&w=majority`
+  );
+  const db = client.db();
+  const meetupsCollection = db.collection("meetups");
+  const meetups: object[] = await meetupsCollection
+    .find({}, { projection: { _id: 1 } })
+    .toArray();
+
   return {
     fallback: false,
-    paths: [
-      {
-        params: {
-          meetupId: "m1",
-        },
-      },
-      {
-        params: {
-          meetupId: "m2",
-        },
-      },
-    ],
+    paths: meetups.map((meetup: any) => ({
+      params: { meetupId: meetup._id.toString() },
+    })),
   };
 }
 
 export async function getStaticProps(context: any) {
   // fetch data for a single meetup
   const meetupId = context.params.meetupId;
-  console.log(meetupId);
+  const objId = new mongoose.Types.ObjectId(meetupId);
+
+  const client = await MongoClient.connect(
+    `mongodb+srv://${username}:${password}@cluster0.86k80sc.mongodb.net/meetups?retryWrites=true&w=majority`
+  );
+  const db = client.db();
+  const meetupsCollection = db.collection("meetups");
+
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: objId,
+  });
+  const selectedMeetupJson = JSON.parse(JSON.stringify(selectedMeetup));
+
+  client.close();
 
   return {
     props: {
       meetupData: {
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/1280px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg",
-        id: meetupId,
-        title: "A First Meetup",
-        address: "Some Street 5, Some City",
-        description: "The meetup description",
+        id: selectedMeetupJson._id.toString(),
+        title: selectedMeetupJson.title,
+        address: selectedMeetupJson.address,
+        image: selectedMeetupJson.image,
+        description: selectedMeetupJson.description,
       },
     },
   };
